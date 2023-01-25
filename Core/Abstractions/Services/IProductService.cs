@@ -5,5 +5,8 @@ namespace Core.Abstractions.Services
     public interface IProductService
     {
         void InsertProduct(Proizvod product);
+
+
+        List<Proizvod> GetAllProducts();
     }
 }

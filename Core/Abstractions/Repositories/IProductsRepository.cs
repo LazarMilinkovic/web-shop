@@ -2,8 +2,10 @@
 
 namespace Core.Abstractions.Repositories
 {
-    public interface IProductRepository
+    public interface IProductsRepository
     {
         void Insert(Proizvod product);
+
+        List<Proizvod> GetAllProducts();
     }
 }
