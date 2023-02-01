@@ -36,10 +36,52 @@ namespace Database.Repositories
 
         public void Insert(Proizvod product)
         {
-
             product.Id = ++_id;
             _products.Add(product.Id, product);
             SaveRepository();
+        }
+
+        public bool Delete(int productId)
+        {
+            if (_products.Remove(productId))
+            {
+                SaveRepository();
+                return true;
+            }
+
+            return false;
+        }
+
+        public Proizvod? GetById(int productId)
+        {
+            if (_products.ContainsKey(productId))
+            {
+                return _products[productId];
+            }
+
+            return null;
+        }
+
+        public List<Proizvod> SearchByKeyWord(string keyword)
+        {
+            return _products
+                    .Values
+                    .Where(p => 
+                    p.Ime.Contains(keyword,StringComparison.OrdinalIgnoreCase) 
+                    || p.Opis.Contains(keyword,StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+        }
+
+        public bool Update(int productId,Proizvod product)
+        {
+            if (!_products.ContainsKey(productId))
+            {
+                return false;
+            }
+
+            _products[productId] = product;
+            SaveRepository();
+            return true;
         }
     }
 }

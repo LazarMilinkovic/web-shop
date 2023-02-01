@@ -13,17 +13,37 @@ namespace Services
             _repository = productRepository;
         }
 
+        public bool Delete(int productId)
+        {
+            return _repository.Delete(productId);
+        }
+
         public List<Proizvod> GetAllProducts()
         {
             return _repository.GetAllProducts();
         }
 
-        public void InsertProduct(Proizvod product)
+        public Proizvod? GetById(int productId)
+        {
+            return _repository.GetById(productId);
+        }
+
+        public void Insert(Proizvod product)
         {
             if (product == null)
                 throw new ArgumentNullException(nameof(product));
 
             _repository.Insert(product);
+        }
+
+        public List<Proizvod> SearchByKeyWord(string keyoword)
+        {
+            return _repository.SearchByKeyWord(keyoword);
+        }
+
+        public bool Update(int productId, Proizvod product)
+        {
+            return _repository.Update(productId, product);
         }
     }
 }

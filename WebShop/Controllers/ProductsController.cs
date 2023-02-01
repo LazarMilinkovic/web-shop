@@ -25,7 +25,7 @@ namespace WebShop.Controllers
         }
 
         [HttpPost("products")]
-        public IActionResult Insert([FromBody] ProizvodModel productModel)
+        public IActionResult Insert([FromBody] ProizvodViewModel productModel)
         {
             var p = new Proizvod
             {
@@ -35,9 +35,42 @@ namespace WebShop.Controllers
                 Opis = productModel.Opis
             };
 
-            _productService.InsertProduct(p);
+            _productService.Insert(p);
 
             return Ok();
+        }
+
+        [HttpGet("products/search/{keyword}")]
+        public List<Proizvod> SearchByKeyword(string keyword)
+        {
+            return _productService.SearchByKeyWord(keyword);
+        }
+
+        [HttpGet("products/{productId}")]
+        public Proizvod? GetById(int productId)
+        {
+            return _productService.GetById(productId);
+        }
+
+        [HttpDelete("products/{productId}")]
+        public bool DeleteById(int productId)
+        {
+            return _productService.Delete(productId);
+        }
+
+        [HttpPut("products")]
+        public bool UpdateProducts(int productId, ProizvodViewModel product)
+        {
+            var p = new Proizvod()
+            {
+                Id = productId,
+                Ime = product.Ime,
+                Kategorija = product.Kategorija,
+                Cena = product.Cena,
+                Opis = product.Opis,
+            };
+
+            return _productService.Update(productId, p);
         }
     }
 }
