@@ -1,14 +1,15 @@
 ﻿using Core.Domain;
+using Models.ViewModels;
 
 namespace Core.Abstractions.Services
 {
     public interface IProductsService
     {
-        List<Proizvod> GetAllProducts();
-        void Insert(Proizvod product);
+        ProductViewModel? GetById(int productId);
+        List<ProductViewModel?> GetAllProducts();
+        void Insert(ProductViewModel product);
+        bool Update(int productId, ProductViewModel product);
         bool Delete(int productId);
-        Proizvod? GetById(int productId);
-        List<Proizvod> SearchByKeyWord(string keyoword);
-        bool Update(int productId, Proizvod product);
+        List<ProductViewModel?> SearchByKeyWord(string keyoword);
     }
 }

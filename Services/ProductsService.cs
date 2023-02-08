@@ -1,6 +1,7 @@
 ﻿using Core.Abstractions.Repositories;
 using Core.Abstractions.Services;
 using Core.Domain;
+using Models.ViewModels;
 
 namespace Services
 {
@@ -13,37 +14,83 @@ namespace Services
             _repository = productRepository;
         }
 
+        public ProductViewModel? GetById(int productId)
+        {
+            return MapToViewModel(_repository.GetById(productId));
+        }
+
+        public List<ProductViewModel?> GetAllProducts()
+        {
+            return _repository
+                .GetAllProducts()
+                .Select<Product?, ProductViewModel?>(p => MapToViewModel(p))
+                .Where(p => p != null)
+                .ToList();
+        }
+
+        public void Insert(ProductViewModel productViewModel)
+        {
+            Product? product = MapFromViewModel(productViewModel);
+
+            if (product == null)
+                throw new ArgumentNullException(nameof(productViewModel));
+
+            _repository.Insert(product);
+        }
+
+        public bool Update(int productId, ProductViewModel productViewModel)
+        {
+            Product? product = MapFromViewModel(productViewModel);
+
+            if (product == null)
+                throw new ArgumentNullException(nameof(productViewModel));
+
+            return _repository.Update(productId, product);
+        }
+
         public bool Delete(int productId)
         {
             return _repository.Delete(productId);
         }
 
-        public List<Proizvod> GetAllProducts()
+        public List<ProductViewModel?> SearchByKeyWord(string keyword)
         {
-            return _repository.GetAllProducts();
+            return _repository
+                .SearchByKeyWord(keyword)
+                .Select<Product?, ProductViewModel?>(p => MapToViewModel(p))
+                .Where(p => p != null)
+                .ToList();
         }
 
-        public Proizvod? GetById(int productId)
+        private ProductViewModel? MapToViewModel(Product? p)
         {
-            return _repository.GetById(productId);
+            if (p == null)
+                return null;
+
+            return new ProductViewModel
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price,
+                Category = p.Category,
+                Description = p.Description,
+            };
         }
 
-        public void Insert(Proizvod product)
+        private Product? MapFromViewModel(ProductViewModel? p)
         {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
+            if (p == null)
+                return null;
 
-            _repository.Insert(product);
+            return new Product
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price,
+                Category = p.Category,
+                Description = p.Description,
+            };
         }
 
-        public List<Proizvod> SearchByKeyWord(string keyoword)
-        {
-            return _repository.SearchByKeyWord(keyoword);
-        }
-
-        public bool Update(int productId, Proizvod product)
-        {
-            return _repository.Update(productId, product);
-        }
     }
 }

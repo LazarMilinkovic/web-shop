@@ -7,52 +7,17 @@ namespace Database.Repositories
 {
     public class ProductRepository : IProductRepository
     {
-        private readonly Dictionary<int, Proizvod> _products;
+        private const string fileName = "WebShopProducts.json";
+
+        private Dictionary<int, Product> _products = new Dictionary<int, Product>();
         private int _id = 0;
 
         public ProductRepository()
         {
-            if (File.Exists("proizvodi.json"))
-                _products = JsonSerializer.Deserialize<Dictionary<int, Proizvod>>(
-                    File.ReadAllText("proizvodi.json"));
-            else
-                _products = new Dictionary<int, Proizvod>();
-
-            _id = _products.Count == 0 
-                ? 0 
-                : _products.Values.Select(p => p.Id).Max();
-
+            LoadDatabase();
         }
 
-        void SaveRepository()
-        {
-            File.WriteAllText("proizvodi.json", JsonSerializer.Serialize(_products));
-        }
-
-        public List<Proizvod> GetAllProducts()
-        {
-            return _products.Values.ToList();
-        }
-
-        public void Insert(Proizvod product)
-        {
-            product.Id = ++_id;
-            _products.Add(product.Id, product);
-            SaveRepository();
-        }
-
-        public bool Delete(int productId)
-        {
-            if (_products.Remove(productId))
-            {
-                SaveRepository();
-                return true;
-            }
-
-            return false;
-        }
-
-        public Proizvod? GetById(int productId)
+        public Product? GetById(int productId)
         {
             if (_products.ContainsKey(productId))
             {
@@ -62,17 +27,20 @@ namespace Database.Repositories
             return null;
         }
 
-        public List<Proizvod> SearchByKeyWord(string keyword)
+        public List<Product> GetAllProducts()
         {
-            return _products
-                    .Values
-                    .Where(p => 
-                    p.Ime.Contains(keyword,StringComparison.OrdinalIgnoreCase) 
-                    || p.Opis.Contains(keyword,StringComparison.OrdinalIgnoreCase))
-                    .ToList();
+            return _products.Values.ToList();
         }
 
-        public bool Update(int productId,Proizvod product)
+        public bool Insert(Product product)
+        {
+            product.Id = ++_id;
+            _products.Add(product.Id, product);
+            SaveDatabase();
+            return true;
+        }
+
+        public bool Update(int productId, Product product)
         {
             if (!_products.ContainsKey(productId))
             {
@@ -80,8 +48,56 @@ namespace Database.Repositories
             }
 
             _products[productId] = product;
-            SaveRepository();
+            SaveDatabase();
             return true;
+        }
+
+        public bool Delete(int productId)
+        {
+            if (_products.Remove(productId))
+            {
+                SaveDatabase();
+                return true;
+            }
+
+            return false;
+        }
+
+        public List<Product> SearchByKeyWord(string keyword)
+        {
+            return _products
+                    .Values
+                    .Where(p =>
+                        p.Name.Contains(keyword, StringComparison.OrdinalIgnoreCase)
+                        || p.Description.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+        }
+
+        private void LoadDatabase()
+        {
+            if (File.Exists(fileName))
+            {
+                try
+                {
+                    _products = JsonSerializer.Deserialize<Dictionary<int, Product>>(
+                        File.ReadAllText(fileName));
+                }
+                catch (Exception ex)
+                {
+                }
+            }
+
+            if (_products == null)
+                _products = new Dictionary<int, Product>();
+
+            _id = _products.Count == 0
+                ? 0
+                : _products.Values.Select(p => p.Id).Max();
+        }
+
+        void SaveDatabase()
+        {
+            File.WriteAllText(fileName, JsonSerializer.Serialize(_products));
         }
     }
 }
